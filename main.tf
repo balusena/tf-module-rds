@@ -12,4 +12,7 @@ resource "aws_rds_cluster" "default" {
   database_name           = var.db_name
   master_username         = data.aws_ssm_parameter.username.value
   master_password         = data.aws_ssm_parameter.password.value
+  db_subnet_group_name    = aws_db_subnet_group.main.name
+  storage_encrypted       = true
+  kms_key_id              = var.kms_key_arn
 }
