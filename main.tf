@@ -1,3 +1,28 @@
+#Creating AWS Security Group
+resource "aws_security_group" "sg" {
+  name        = "${var.component}-${var.env}-sg"
+  description = "${var.component}-${var.env}-sg"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = var.sg_subnet_cidr
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.component}-${var.env}-sg"
+  }
+}
+
 resource "aws_db_subnet_group" "main" {
   name                    = "main"
   subnet_ids              = var.subnet_ids
@@ -14,6 +39,7 @@ resource "aws_rds_cluster" "main" {
   db_subnet_group_name    = aws_db_subnet_group.main.name
   storage_encrypted       = true
   kms_key_id              = var.kms_key_arn
+  vpc_security_group_ids  = [aws_security_group.sg.id]
 }
 
 resource "aws_rds_cluster_instance" "main" {
